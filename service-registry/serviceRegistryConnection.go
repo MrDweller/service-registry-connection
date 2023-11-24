@@ -11,6 +11,7 @@ type ServiceRegistryConnection interface {
 	Connect() error
 	RegisterService(digitalTwinModel models.ServiceDefinition, systemDefinition models.SystemDefinition) ([]byte, error)
 	UnRegisterService(serviceDefinition models.ServiceDefinition, systemDefinition models.SystemDefinition) error
+	RegisterSystem(systemDefinition models.SystemDefinition) ([]byte, error)
 	UnRegisterSystem(systemDefinition models.SystemDefinition) error
 }
 

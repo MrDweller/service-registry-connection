@@ -117,6 +117,41 @@ func (serviceRegistry ServiceRegistryArrowhead_4_6_1) UnRegisterService(serviceD
 	return nil
 }
 
+func (serviceRegistry ServiceRegistryArrowhead_4_6_1) RegisterSystem(systemDefinition models.SystemDefinition) ([]byte, error) {
+	payload, err := json.Marshal(systemDefinition)
+
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", "https://"+serviceRegistry.Address+":"+strconv.Itoa(serviceRegistry.Port)+"/serviceregistry/register-system", bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client, err := serviceRegistry.getClient()
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		errorString := fmt.Sprintf("status: %s, body: %s", resp.Status, string(body))
+		return nil, errors.New(errorString)
+	}
+
+	return body, nil
+}
+
 func (serviceRegistry ServiceRegistryArrowhead_4_6_1) UnRegisterSystem(systemDefinition models.SystemDefinition) error {
 	url := fmt.Sprintf("https://"+serviceRegistry.Address+":"+strconv.Itoa(serviceRegistry.Port)+"/serviceregistry/unregister-system?address=%s&port=%s&system_name=%s", url.QueryEscape(systemDefinition.Address), url.QueryEscape(strconv.Itoa(systemDefinition.Port)), url.QueryEscape(systemDefinition.SystemName))
 	req, err := http.NewRequest("DELETE", url, nil)
