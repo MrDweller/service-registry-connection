@@ -5,5 +5,5 @@ type ServiceQueryResult struct {
 }
 
 type QueryResult struct {
-	Provider ServiceDefinition `json:"provider"`
+	Provider SystemDefinition `json:"provider"`
 }
