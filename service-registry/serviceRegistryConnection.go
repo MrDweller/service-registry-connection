@@ -13,6 +13,7 @@ type ServiceRegistryConnection interface {
 	UnRegisterService(serviceDefinition models.ServiceDefinition, systemDefinition models.SystemDefinition) error
 	RegisterSystem(systemDefinition models.SystemDefinition) ([]byte, error)
 	UnRegisterSystem(systemDefinition models.SystemDefinition) error
+	Query(serviceDefinition models.ServiceDefinition) (*models.ServiceQueryResult, error)
 }
 
 type ServiceRegistryImplementationType string

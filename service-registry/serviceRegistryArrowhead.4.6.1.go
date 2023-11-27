@@ -30,6 +30,10 @@ type RegisterServiceDTO struct {
 	ProviderSystem models.SystemDefinition `json:"providerSystem"`
 }
 
+type QueryDTO struct {
+	ServiceDefinitionRequirement string `json:"serviceDefinitionRequirement"`
+}
+
 func (serviceRegistry ServiceRegistryArrowhead_4_6_1) Connect() error {
 
 	result, err := serviceRegistry.echoServiceRegistry()
@@ -180,6 +184,47 @@ func (serviceRegistry ServiceRegistryArrowhead_4_6_1) UnRegisterSystem(systemDef
 	}
 
 	return nil
+}
+
+func (serviceRegistry ServiceRegistryArrowhead_4_6_1) Query(serviceDefinition models.ServiceDefinition) (*models.ServiceQueryResult, error) {
+	queryDTO := QueryDTO{
+		ServiceDefinitionRequirement: serviceDefinition.ServiceDefinition,
+	}
+	payload, err := json.Marshal(queryDTO)
+
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", "https://"+serviceRegistry.Address+":"+strconv.Itoa(serviceRegistry.Port)+"/serviceregistry/query", bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client, err := serviceRegistry.getClient()
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		errorString := fmt.Sprintf("status: %s, body: %s", resp.Status, string(body))
+		return nil, errors.New(errorString)
+	}
+
+	var serviceQueryResult models.ServiceQueryResult
+	json.Unmarshal(body, &serviceQueryResult)
+
+	return &serviceQueryResult, nil
 }
 
 func (serviceRegistry ServiceRegistryArrowhead_4_6_1) echoServiceRegistry() ([]byte, error) {
