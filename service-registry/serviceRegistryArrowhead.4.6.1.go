@@ -216,7 +216,7 @@ func (serviceRegistry ServiceRegistryArrowhead_4_6_1) Query(serviceDefinition mo
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusCreated {
+	if resp.StatusCode != http.StatusOK {
 		errorString := fmt.Sprintf("status: %s, body: %s", resp.Status, string(body))
 		return nil, errors.New(errorString)
 	}
