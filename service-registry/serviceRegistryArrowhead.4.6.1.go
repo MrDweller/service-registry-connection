@@ -28,7 +28,12 @@ type RegisterServiceDTO struct {
 	models.ServiceDefinition
 	Interfaces     []string                `json:"interfaces"`
 	ProviderSystem models.SystemDefinition `json:"providerSystem"`
+	Secure         Security                `json:"secure"`
 }
+
+type Security string
+
+const CERTIFICATE Security = "CERTIFICATE"
 
 type QueryDTO struct {
 	ServiceDefinitionRequirement string `json:"serviceDefinitionRequirement"`
@@ -56,6 +61,7 @@ func (serviceRegistry ServiceRegistryArrowhead_4_6_1) RegisterService(serviceDef
 			"HTTP-SECURE-JSON",
 		},
 		ProviderSystem: systemDefinition,
+		Secure:         CERTIFICATE,
 	}
 	payload, err := json.Marshal(reqisterServiceDTO)
 
